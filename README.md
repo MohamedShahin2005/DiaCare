@@ -62,10 +62,7 @@ The project follows **Clean Architecture**:
 
 ---
 
-##  Future Work
 
-- Integrate AI Prediction Model  
-- Add Role-based Authorization  
 - Add Health Articles & Tips  
 - Potential mobile app integration  
 
