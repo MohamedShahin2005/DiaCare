@@ -12,7 +12,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-
+using AutoMapper;         // for mapping by mapper solve bad smell code reduntant code.
 namespace DiaCare.Application.Services
 {
     public class PredictionService : IPredictionService
@@ -22,10 +22,12 @@ namespace DiaCare.Application.Services
         private readonly IPredictionAdapter _predictionAdapter;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper; // AutoMapper to handle object-to-object mapping.
+
 
         public PredictionService(HttpClient httpClient, IConfiguration configuration,
             IPredictionAdapter predictionAdapter,IHttpContextAccessor httpContextAccessor,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork, IMapper mapper)
             {
                 _baseUrl = configuration["AISettings:BaseUrl"]
                     ?? throw new Exception("AI Base URL is missing");
@@ -34,6 +36,7 @@ namespace DiaCare.Application.Services
                 _predictionAdapter = predictionAdapter;
                 _httpContextAccessor = httpContextAccessor;
                 _unitOfWork = unitOfWork;
+                _mapper = mapper; // add mapper to constructor
             }
         public async Task<PredictionResultDto> PredictAsync(PredictionInputDto inputdto)
         {
@@ -61,6 +64,8 @@ namespace DiaCare.Application.Services
                     .FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
                 // 6. Create HealthProfile
+
+                /*
                 var healthProfile = new HealthProfile
                 {
                     UserId = userId,
@@ -80,6 +85,11 @@ namespace DiaCare.Application.Services
 
                     CreatedAt = DateTime.UtcNow
                 };
+                */
+                // Using AutoMapper to map from inputdto to healthProfile
+                var healthProfile = _mapper.Map<HealthProfile>(inputdto);
+                healthProfile.UserId = userId;
+                healthProfile.CreatedAt = DateTime.UtcNow;
 
                 // 7. Save HealthProfile
                 await _unitOfWork.HealthProfiles.AddAsync(healthProfile);
