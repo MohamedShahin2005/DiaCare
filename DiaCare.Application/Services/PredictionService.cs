@@ -104,7 +104,7 @@ namespace DiaCare.Application.Services
                     Recommendation = "Please follow up with a specialist for further advice.",
                     CreatedAt = DateTime.UtcNow
                 };
-                // 9. Save Prediction
+                // 9. Save Prediction result
                 await _unitOfWork.PredictionResults.AddAsync(predictionRecord);
                 await _unitOfWork.SaveChangesAsync();
 
